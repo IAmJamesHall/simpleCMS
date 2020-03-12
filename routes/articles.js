@@ -21,24 +21,37 @@ async function checkForLoggedInState(req) {
   if (username) {
     foundUser = await User.findOne({
       where: { username }
-    })
+    });
   }
   return (foundUser ? true : false);
+}
+
+async function getUser(req) {
+  const { username } = req.cookies;
+  let foundUser = await User.findOne({
+    attributes: ['fullname'],
+    where: { username }
+  });
+  foundUser = foundUser.toJSON();
+  return foundUser.fullname;
 }
 
 /* GET articles listing. */
 router.get('/', asyncHandler(async (req, res) => {
   const loggedIn = await checkForLoggedInState(req);
+  let fullName;
+  if (loggedIn) {
+    fullName = await getUser(req);
+  }
   const articles = await Article.findAll({ order: [["createdAt", "DESC"]] });
-  console.log('loggedIn: ', loggedIn)
-  res.render("articles/index", { articles, title: "Sequelize-It!", loggedIn });
+  res.render("articles/index", { articles, title: "Sequelize-It!", fullName, loggedIn });
 }));
 
 /* Create a new article form. */
 router.get('/new', async (req, res) => {
   const loggedIn = await checkForLoggedInState(req);
   if (loggedIn) {
-    res.render("articles/new", { article: {}, title: "New Article" });
+    res.render("articles/new", { article: {}, title: "New Article", loggedIn });
   } else {
     res.redirect('/articles');
   }
@@ -56,7 +69,7 @@ router.post('/', asyncHandler(async (req, res) => {
     } catch (error) {
       if (error.name === "SequelizeValidationError") {
         article = await Article.build(req.body);
-        res.render("articles/new", { article, errors: error.errors, title: "New Article" })
+        res.render("articles/new", { article, errors: error.errors, title: "New Article", loggedIn })
       } else {
         throw error; //error caught in the asyncHandler's catch block
       }
@@ -73,7 +86,7 @@ router.get("/:id/edit", asyncHandler(async (req, res) => {
   if (loggedIn) {
     const article = await Article.findByPk(req.params.id);
     if (article) {
-      res.render("articles/edit", { article, title: "Edit Article" });
+      res.render("articles/edit", { article, title: "Edit Article", loggedIn });
     } else {
       res.sendStatus(404);
     }

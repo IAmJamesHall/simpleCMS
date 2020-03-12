@@ -9,4 +9,10 @@ npm install
 npm run
 ```
 
-The CMS should be running on `localhost:3000`
+The CMS should be running on `localhost:3000`.
+
+Login credentials are:
+```
+username: user
+password: pass
+```

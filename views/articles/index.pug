@@ -2,7 +2,10 @@ extends ../layout
 
 block content
   div.subheader
-    h2 Articles
+    if fullName
+      h2 Welcome #{fullName} 
+    else
+      h2 Articles
     if loggedIn
       a(href="/articles/new", class="btn-new") Create Article &#43;
     include loginForm
