@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  div.subheader
+    h2 Articles
+    if loggedIn
+      a(href="/articles/new", class="btn-new") Create Article &#43;
+    include loginForm
+    
+    
+  each article in articles
+    article(onclick="window.location = '/articles/" + article.id + "'")
+        h3= article.title
+        include by_line
+        p= article.shortDescription()
+        a(href = "/articles/" + article.id) Read More &rarr;

@@ -1,0 +1,12 @@
+extends ../layout
+
+block content
+  h2= article.title
+  include by_line
+  p= article.body
+  a(href="../") &larr; Back 
+  if loggedIn
+    | | 
+    a(href="/articles/" + article.id + "/edit") Edit Article 
+    | | 
+    a(href="/articles/" + article.id + "/delete") Delete Article
